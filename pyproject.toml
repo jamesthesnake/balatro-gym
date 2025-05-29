@@ -6,17 +6,52 @@ authors = ["Cassius Villareal <cassiusfive@gmail.com>"]
 license = "MIT"
 readme = "README.md"
 
+# ----------------------------------------------------------------
+# Runtime dependencies
+# ----------------------------------------------------------------
 [tool.poetry.dependencies]
-python = "^3.12"
+python   = "^3.12"
 gymnasium = "^0.29.1"
-numpy = "^1.26.4"
+numpy    = "^1.26.4"
 
+# ----------------------------------------------------------------
+# Dev dependencies
+# ----------------------------------------------------------------
 [tool.poetry.group.dev.dependencies]
-pytest = "^8.1.1"
+pytest   = "^8.1.1"
 
-[build-system]
-requires = ["poetry-core"]
-build-backend = "poetry.core.masonry.api"
+# ----------------------------------------------------------------
+# Explicitly declare which folders are packages
+# This ensures poetry (and pip) installs them in editable mode.
+# ----------------------------------------------------------------
+[[tool.poetry.packages]]
+include = "balatro_gym"
 
+[[tool.poetry.packages]]
+include = "agents"
+
+[[tool.poetry.packages]]
+include = "utils"
+
+# (Optionally, if you want to ship your examples folder:)
+# [[tool.poetry.packages]]
+# include = "examples"
+
+# ----------------------------------------------------------------
+# Console script entry-point for your example runner
+# ----------------------------------------------------------------
+[tool.poetry.scripts]
+balatro-play = "examples.play_with_llm:main"
+
+# ----------------------------------------------------------------
+# pytest configuration
+# ----------------------------------------------------------------
 [tool.pytest.ini_options]
 addopts = "-v"
+
+# ----------------------------------------------------------------
+# Build system
+# ----------------------------------------------------------------
+[build-system]
+requires    = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
