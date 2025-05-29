@@ -32,19 +32,39 @@ class StateFormatter:
         if env.jokers:
             sections.append("=== JOKERS ===")
             for i, joker in enumerate(env.jokers):
-                sections.append(f"{i+1}. {joker.get('name', 'Unknown')} - {joker.get('effect', 'No description')}")
+                effect_desc = joker.description
+                if hasattr(joker, 'data') and joker.data:
+                    # Add dynamic data like Vampire's current multiplier
+                    if 'vampire_mult' in joker.data:
+                        effect_desc += f" (Current: X{joker.data['vampire_mult']:.1f})"
+                    if joker.data.get('negative'):
+                        effect_desc += " [NEGATIVE]"
+                    if joker.data.get('polychrome'):
+                        effect_desc += " [POLYCHROME]"
+                sections.append(f"{i+1}. {joker.name} - {effect_desc}")
         else:
             sections.append("=== JOKERS ===")
             sections.append("No jokers owned")
         
         sections.append("")
         
-        # Consumable
-        sections.append("=== CONSUMABLE ===")
-        if env.consumable:
-            sections.append(f"{env.consumable.get('name', 'Unknown')} - {env.consumable.get('effect', 'No description')}")
+        # Consumables
+        sections.append("=== CONSUMABLES ===")
+        if env.consumables:
+            for i, consumable in enumerate(env.consumables):
+                sections.append(f"{i+1}. {consumable.name} ({consumable.consumable_type.value}) - {consumable.description}")
         else:
             sections.append("Empty")
+        
+        sections.append("")
+        
+        # Hand levels (if any upgraded)
+        upgraded_hands = [(ht, level) for ht, level in env.hand_levels.items() if level > 1]
+        if upgraded_hands:
+            sections.append("=== HAND LEVELS ===")
+            for hand_type, level in upgraded_hands:
+                sections.append(f"{hand_type.name.replace('_', ' ')}: Level {level}")
+            sections.append("")
         
         sections.append("")
         
@@ -73,14 +93,25 @@ class StateFormatter:
         
         return "\n".join(lines)
     
-    def _format_hand(self, hand: List[Dict]) -> str:
+    def _format_hand(self, hand: List) -> str:
         """Format a hand of cards."""
         if not hand:
             return "Empty"
         
-        # TODO: Implement proper card formatting
-        # For now, just return placeholder
-        return f"{len(hand)} cards"
+        # Group by suit for readability
+        by_suit = {}
+        for card in hand:
+            suit_name = str(card.suit)
+            if suit_name not in by_suit:
+                by_suit[suit_name] = []
+            by_suit[suit_name].append(str(card))
+        
+        # Format as "♠: KS, 10S | ♥: AH, 5H"
+        parts = []
+        for suit, cards in by_suit.items():
+            parts.append(f"{suit}: {', '.join(cards)}")
+        
+        return " | ".join(parts)
     
     def _format_shop(self, env) -> str:
         """Format shop contents."""
@@ -91,19 +122,33 @@ class StateFormatter:
             lines.append("Jokers:")
             for i, joker in enumerate(env.shop_jokers):
                 if joker:
-                    lines.append(f"  Slot {i}: {joker['name']} - ${joker['cost']}")
+                    discount = env.voucher_effects.get("shop_discount", 0)
+                    price = int(joker.cost * (1 - discount))
+                    lines.append(f"  Slot {i}: {joker.name} - ${price} - {joker.description}")
                 else:
                     lines.append(f"  Slot {i}: [SOLD]")
         
         # Packs
         lines.append("\nPacks:")
+        pack_price = int(4 * (1 - env.voucher_effects.get("shop_discount", 0)))
         for pack_type, available in env.shop_packs.items():
             if available:
-                lines.append(f"  {pack_type.title()} Pack - $4")
+                lines.append(f"  {pack_type.title()} Pack - ${pack_price}")
         
         # Voucher
         if env.shop_voucher:
             lines.append(f"\nVoucher:")
-            lines.append(f"  {env.shop_voucher['name']} - ${env.shop_voucher['cost']}")
+            lines.append(f"  {env.shop_voucher.name} - ${env.shop_voucher.cost}")
+            lines.append(f"    {env.shop_voucher.description}")
+        
+        # Playing cards (if available)
+        if env.shop_cards:
+            lines.append("\nPlaying Cards:")
+            card_price = int(3 * (1 - env.voucher_effects.get("shop_discount", 0)))
+            for i, card in enumerate(env.shop_cards):
+                lines.append(f"  Card {i}: {card} - ${card_price}")
+        
+        lines.append(f"\nYour Money: ${env.money}")
+        lines.append("(Use NO_OP action to leave shop)")
         
         return "\n".join(lines)
