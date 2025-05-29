@@ -86,4 +86,17 @@ class RewardShaper:
     def calculate_episode_bonus(self, final_ante: int, total_money: int,
                               victory: bool) -> float:
         """Calculate final bonus rewards for the episode."""
-        reward = 0.
+        reward = 0.0
+        
+        # Victory bonus
+        if victory:
+            reward += 1000.0
+        
+        # Ante progression bonus
+        reward += (final_ante - 1) * self.weights["ante_progression"]
+        
+        # Money management bonus
+        if total_money > 50:
+            reward += total_money * self.weights["money_saved"]
+        
+        return reward
