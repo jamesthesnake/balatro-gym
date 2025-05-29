@@ -1,0 +1,17 @@
+gymnasium>=0.29.0
+numpy>=1.24.0
+pandas>=2.0.0
+
+# For LLM agents (choose based on your LLM)
+openai>=1.0.0  # For OpenAI API
+anthropic>=0.3.0  # For Claude API
+# google-generativeai>=0.3.0  # For Google AI
+# transformers>=4.30.0  # For local models
+
+# Optional for visualization/analysis
+matplotlib>=3.7.0
+seaborn>=0.12.0
+
+# For RL agents (optional)
+# stable-baselines3>=2.0.0
+# torch>=2.0.0
