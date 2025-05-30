@@ -81,7 +81,15 @@ class Deck:
         """Add cards back to deck (for discards)."""
         self.cards.extend(cards)
         self.shuffle()
-
+    def draw_pack(self, pack_type: str) -> List[Card]: # Or whatever pack_type is
+        # Example: A standard pack gives 5 cards
+        if pack_type == "standard_pack": # This is just an example pack_type
+            return self.draw(5)
+        # Add logic for other pack types if necessary
+        # Or a more generic implementation
+        # ...
+        # return some_cards
+        pass # Replace with actual implementation
 class HandType(IntEnum):
     HIGH_CARD = 1
     PAIR = 2

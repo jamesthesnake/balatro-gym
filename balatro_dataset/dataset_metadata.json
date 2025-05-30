@@ -1,0 +1,10 @@
+{
+  "total_episodes": 1000,
+  "total_steps": 19818,
+  "total_reward": 39713.1177389162,
+  "avg_steps_per_episode": 19.818,
+  "avg_reward_per_episode": 39.713117738916196,
+  "policy_type": "random",
+  "generation_timestamp": 1748626437.516562,
+  "num_workers": 8
+}

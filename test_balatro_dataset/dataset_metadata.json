@@ -1,0 +1,11 @@
+{
+  "total_episodes": 20,
+  "total_steps": 624,
+  "total_reward": 3649.3653464102817,
+  "avg_steps_per_episode": 31.2,
+  "avg_reward_per_episode": 182.4682673205141,
+  "policy_type": "test",
+  "generation_timestamp": 1748627943.461098,
+  "num_workers": 1,
+  "dataset_version": "1.0-test"
+}
