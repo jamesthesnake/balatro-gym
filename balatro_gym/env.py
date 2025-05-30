@@ -139,12 +139,61 @@ class BalatroEnv(gym.Env):
         # Example card-play logic
         if action.name.startswith("PLAY_CARD_"):
             idx = action.value - Action.PLAY_CARD_0.value
-            card = self.hand.pop(idx)
-            # TODO: apply card effects
-            score = HandEvaluator.evaluate(self.hand)
-            self.current_score += score
-            reward += self.reward_shaper.on_play(card, self)
-            self.hands_remaining -= 1
+            
+            # --- Important Note on Gameplay Logic for PLAY_CARD_X ---
+            # Currently, one card is popped, and then the *remaining* hand is evaluated.
+            # In Balatro, you typically select 1-5 cards, and *those selected cards* are evaluated.
+            # The logic below fixes the TypeError based on the current structure,
+            # but you may want to revisit how 'played_hand_cards' are determined.
+            # For example, if PLAY_CARD_X means "play card at hand[idx] AND other selected cards",
+            # you'd need a selection mechanism.
+            # If it means "these are the 1-5 cards selected by the agent to play this turn",
+            # then 'idx' might not be used, or PLAY_CARD_X actions might represent full hand plays.
+            
+            if idx < len(self.hand): # Ensure index is valid before popping
+                played_card_for_reward_shaping = self.hand.pop(idx) # Card for reward shaper
+                
+                # For evaluation, Balatro evaluates the specific cards played (1-5 cards).
+                # Currently, your code evaluates self.hand *after* popping one.
+                # Let's assume for now 'self.hand' (after pop) are the cards to evaluate.
+                # If PLAY_CARD_X action implies a specific set of cards to be played,
+                # those should be passed to HandEvaluator.evaluate().
+                # For example, if your intent was to play only the popped card (which is unusual for Balatro scoring):
+                # played_cards_for_evaluation = [played_card_for_reward_shaping]
+                # Or if it's a pre-selected hand that 'idx' refers to within that selection:
+                # # (This would require a card selection mechanism first)
+
+                # Using current structure: evaluating the remaining self.hand
+                cards_to_evaluate = self.hand 
+                # If your game logic means PLAY_CARD_X implies playing a specific *set* of cards
+                # (e.g., cards previously selected by the agent), then `cards_to_evaluate`
+                # should be that set of cards, not just `self.hand`.
+
+                if cards_to_evaluate: # Only evaluate if there are cards
+                    hand_type, scoring_cards = HandEvaluator.evaluate(cards_to_evaluate)
+                    
+                    # Calculate score
+                    current_hand_chips = hand_type.get_base_chips()
+                    for card_in_scoring_hand in scoring_cards:
+                        current_hand_chips += card_in_scoring_hand.get_chip_value()
+                    
+                    current_hand_mult = hand_type.get_base_mult()
+                    
+                    calculated_score = current_hand_chips * current_hand_mult
+                    self.current_score += calculated_score
+                else:
+                    # No cards to evaluate, or handle as per your game rules (e.g., score 0)
+                    calculated_score = 0 
+                    # self.current_score += 0 (no change)
+
+                self.hands_remaining -= 1
+                reward += self.reward_shaper.on_play(played_card_for_reward_shaping, self)
+            else:
+                # Invalid action if idx is out of bounds (e.g., trying to play a card from an empty hand slot)
+                # This should ideally be caught by the action_mask, but good to have a fallback.
+                print(f"Warning: Tried to play card at invalid index {idx} from hand.")
+                # Handle appropriately, e.g., small penalty or no operation.
+                pass
 
         elif action == Action.DISCARD_HAND:
             self.hand = self.deck.draw(self.hand_size)
@@ -208,6 +257,107 @@ class BalatroEnv(gym.Env):
     	Right now this is a stub to prevent crashes.
 	 """
     	pass
+    def _skip_cost(self):
+        """
+        Helper method to determine the cost of skipping a blind.
+        Implement your logic here, e.g., fixed cost, or depends on ante.
+        """
+        # Example:
+        # if self.current_blind == "small":
+        #     return 5 + self.current_ante
+        # elif self.current_blind == "big":
+        #     return 10 + self.current_ante
+        return 5 # Placeholder: Define actual skip cost logic
+
+    def action_mask(self) -> np.ndarray:
+        mask = np.zeros(Action.count(), dtype=np.int8)
+
+        # --- META CONTROL ---
+        # NO_OP is often a safe fallback.
+        # Consider if it should always be available or only in specific circumstances.
+        mask[Action.NO_OP.value] = 1
+
+        # --- SHOP ACTIONS ---
+        if self.in_shop:
+            # BUY_JOKER_SLOT_0 to BUY_JOKER_SLOT_4
+            for i in range(5): # Corresponds to BUY_JOKER_SLOT_0 through BUY_JOKER_SLOT_4
+                action_val = Action.BUY_JOKER_SLOT_0.value + i
+                if i < len(self.shop_jokers): # Check if a joker exists in this shop slot
+                    joker_in_shop = self.shop_jokers[i]
+                    # Ensure joker_in_shop has a 'cost' attribute
+                    if hasattr(joker_in_shop, 'cost') and self.money >= joker_in_shop.cost and len(self.jokers) < self.joker_slots:
+                        mask[action_val] = 1
+            
+            # BUY_PACK_TAROT, BUY_PACK_PLANET, BUY_PACK_SPECTRAL
+            # Assuming pack_cost is consistent for these types as in _apply_action
+            pack_base_cost = 4 # From your _apply_action
+            effective_pack_cost = pack_base_cost * (1 - self.voucher_effects.get("shop_discount", 0))
+
+            # Check if packs are available in the shop (e.g., self.shop_packs might store quantity or availability)
+            # For simplicity here, we'll just check money. You might need more detailed pack availability logic.
+            if 'tarot' in self.shop_packs and self.shop_packs['tarot'] > 0: # Example: check if pack exists and quantity > 0
+                if self.money >= effective_pack_cost:
+                    mask[Action.BUY_PACK_TAROT.value] = 1
+            
+            if 'planet' in self.shop_packs and self.shop_packs['planet'] > 0:
+                if self.money >= effective_pack_cost:
+                    mask[Action.BUY_PACK_PLANET.value] = 1
+
+            if 'spectral' in self.shop_packs and self.shop_packs['spectral'] > 0:
+                if self.money >= effective_pack_cost:
+                    mask[Action.BUY_PACK_SPECTRAL.value] = 1
+
+            # BUY_VOUCHER
+            if self.shop_voucher is not None:
+                # Ensure self.shop_voucher has a 'cost' attribute
+                if hasattr(self.shop_voucher, 'cost') and self.money >= self.shop_voucher.cost:
+                    # Also check if voucher is not already owned if it's unique
+                    mask[Action.BUY_VOUCHER.value] = 1
+            
+            # MISSING ACTIONS: REROLL_SHOP and LEAVE_SHOP
+            # Your Action enum doesn't have these. This might make it hard to
+            # leave the shop or refresh it. Consider how game flow handles this.
+            # If NO_OP is meant to leave the shop when in shop and no other action is taken,
+            # that logic would be part of your _apply_action for NO_OP when self.in_shop is true.
+
+        # --- ROUND ACTIONS (NOT IN SHOP) ---
+        else: # not self.in_shop
+            # PLAY_CARD_0 to PLAY_CARD_4
+            # These actions imply playing the card at the given hand index.
+            # The actual game of Balatro involves selecting 1-5 cards and playing a poker hand.
+            # This implementation is based on your current _apply_action.
+            if self.hands_remaining > 0:
+                for i in range(5): # PLAY_CARD_0 to PLAY_CARD_4
+                    action_val = Action.PLAY_CARD_0.value + i
+                    if i < len(self.hand): # Check if card index is valid for current hand
+                        mask[action_val] = 1
+            
+            # DISCARD_HAND
+            if self.discards_remaining > 0 and len(self.hand) > 0 : # Can only discard if you have cards and discards left
+                mask[Action.DISCARD_HAND.value] = 1
+
+            # END_HAND
+            # Based on _apply_action, this seems to be for ending the current attempt at the blind.
+            # It might be available if you've played at least one card or made some move,
+            # or simply if hands_remaining > 0.
+            if self.hands_remaining > 0: # Or some other condition like cards have been selected
+                 mask[Action.END_HAND.value] = 1
+            
+            # SKIP_BLIND
+            cost_to_skip = self._skip_cost()
+            if self.money >= cost_to_skip:
+                mask[Action.SKIP_BLIND.value] = 1
+            
+            # USE_CONSUMABLE
+            if len(self.consumables) > 0: # Assuming self.consumables is a list of available consumables
+                 mask[Action.USE_CONSUMABLE.value] = 1
+            
+            # MISSING ACTION: GO_TO_SHOP
+            # How does self.in_shop become True? This transition needs to be handled,
+            # possibly automatically in _apply_action after a blind is completed (win or lose).
+
+        return mask
+
     def _render_human(self):
         """
         Simple text-based rendering of the current state.
