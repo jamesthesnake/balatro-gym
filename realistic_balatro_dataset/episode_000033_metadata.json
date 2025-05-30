@@ -1,0 +1,15 @@
+{
+  "episode_id": 33,
+  "worker_id": 0,
+  "policy_type": "heuristic",
+  "total_steps": 0,
+  "total_reward": 0,
+  "episode_length": 0,
+  "start_timestamp": 1748635379.679838,
+  "end_timestamp": 1748635379.68665,
+  "final_ante": 0,
+  "max_chips": 0,
+  "max_money": 0,
+  "env_type": "fixed_balatro_gym",
+  "non_zero_rewards": 0
+}

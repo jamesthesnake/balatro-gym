@@ -1,0 +1,17 @@
+{
+  "total_episodes": 1000,
+  "total_steps": 4000,
+  "total_reward": 0.0,
+  "avg_steps_per_episode": 4.0,
+  "avg_reward_per_episode": 0.0,
+  "policy_type": "heuristic",
+  "generation_timestamp": 1748630042.8891368,
+  "num_workers": 8,
+  "dataset_version": "2.0-real-balatro-fixed",
+  "env_type": "real_balatro_gym",
+  "generation_config": {
+    "max_steps_per_episode": 500,
+    "total_requested_episodes": 1000,
+    "successful_episodes": 1000
+  }
+}

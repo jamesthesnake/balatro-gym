@@ -1,0 +1,20 @@
+{
+  "episode_id": 365,
+  "worker_id": 2,
+  "policy_type": "heuristic",
+  "total_steps": 5,
+  "total_reward": 8.162301554089591,
+  "episode_length": 5,
+  "start_timestamp": 1748629139.5210838,
+  "end_timestamp": 1748629139.521228,
+  "final_ante": 1,
+  "max_chips": 50,
+  "max_money": 12,
+  "strategy_tag_counts": {
+    "action_select_card_8": 2,
+    "hand_building": 3,
+    "action_play_hand": 2,
+    "aggressive": 2,
+    "action_select_card_1": 1
+  }
+}

@@ -1,0 +1,17 @@
+{
+  "episode_id": 26,
+  "worker_id": 0,
+  "policy_type": "heuristic",
+  "total_steps": 1,
+  "total_reward": 2.1640532967410095,
+  "episode_length": 1,
+  "start_timestamp": 1748629139.117758,
+  "end_timestamp": 1748629139.117771,
+  "final_ante": 1,
+  "max_chips": 0,
+  "max_money": 10,
+  "strategy_tag_counts": {
+    "action_select_card_7": 1,
+    "hand_building": 1
+  }
+}

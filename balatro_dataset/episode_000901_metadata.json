@@ -1,0 +1,27 @@
+{
+  "episode_id": 901,
+  "worker_id": 7,
+  "policy_type": "heuristic",
+  "total_steps": 86,
+  "total_reward": 179.83993597686168,
+  "episode_length": 86,
+  "start_timestamp": 1748629139.674907,
+  "end_timestamp": 1748629139.676157,
+  "final_ante": 1,
+  "max_chips": 50,
+  "max_money": 12,
+  "strategy_tag_counts": {
+    "action_select_card_7": 7,
+    "hand_building": 39,
+    "action_play_hand": 38,
+    "aggressive": 38,
+    "action_select_card_3": 5,
+    "action_discard_hand": 9,
+    "action_select_card_2": 7,
+    "action_select_card_1": 4,
+    "action_select_card_8": 3,
+    "action_select_card_5": 7,
+    "action_select_card_6": 4,
+    "action_select_card_4": 2
+  }
+}

@@ -1,10 +1,17 @@
 {
   "total_episodes": 1000,
-  "total_steps": 19818,
-  "total_reward": 39713.1177389162,
-  "avg_steps_per_episode": 19.818,
-  "avg_reward_per_episode": 39.713117738916196,
-  "policy_type": "random",
-  "generation_timestamp": 1748626437.516562,
-  "num_workers": 8
+  "total_steps": 19777,
+  "total_reward": 39085.66391045718,
+  "avg_steps_per_episode": 19.777,
+  "avg_reward_per_episode": 39.08566391045718,
+  "policy_type": "heuristic",
+  "generation_timestamp": 1748629140.149855,
+  "num_workers": 8,
+  "dataset_version": "1.0",
+  "balatro_gym_version": "unknown",
+  "generation_config": {
+    "max_steps_per_episode": 200,
+    "total_requested_episodes": 1000,
+    "successful_episodes": 1000
+  }
 }

@@ -1,0 +1,18 @@
+{
+  "episode_id": 3359,
+  "worker_id": 5,
+  "policy_type": "random",
+  "total_steps": 5,
+  "total_reward": 0.1,
+  "episode_length": 5,
+  "start_timestamp": 1748630270.8979251,
+  "end_timestamp": 1748630270.8991401,
+  "final_ante": [
+    1
+  ],
+  "max_chips": 0,
+  "max_money": [
+    4
+  ],
+  "env_type": "real_balatro_gym"
+}

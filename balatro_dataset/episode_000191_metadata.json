@@ -1,0 +1,25 @@
+{
+  "episode_id": 191,
+  "worker_id": 1,
+  "policy_type": "heuristic",
+  "total_steps": 28,
+  "total_reward": 42.230772758968406,
+  "episode_length": 28,
+  "start_timestamp": 1748629139.365443,
+  "end_timestamp": 1748629139.365634,
+  "final_ante": 1,
+  "max_chips": 50,
+  "max_money": 12,
+  "strategy_tag_counts": {
+    "action_select_card_7": 3,
+    "hand_building": 14,
+    "action_play_hand": 13,
+    "aggressive": 13,
+    "action_select_card_2": 2,
+    "action_select_card_3": 4,
+    "action_select_card_4": 1,
+    "action_select_card_1": 3,
+    "action_discard_hand": 1,
+    "action_select_card_6": 1
+  }
+}

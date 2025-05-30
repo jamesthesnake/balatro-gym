@@ -1,0 +1,17 @@
+{
+  "episode_id": 880,
+  "worker_id": 7,
+  "policy_type": "heuristic",
+  "total_steps": 1,
+  "total_reward": -0.9559000142995504,
+  "episode_length": 1,
+  "start_timestamp": 1748629139.662029,
+  "end_timestamp": 1748629139.6620889,
+  "final_ante": 1,
+  "max_chips": 0,
+  "max_money": 10,
+  "strategy_tag_counts": {
+    "action_select_card_2": 1,
+    "hand_building": 1
+  }
+}

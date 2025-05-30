@@ -1,0 +1,19 @@
+{
+  "episode_id": 834,
+  "worker_id": 6,
+  "policy_type": "heuristic",
+  "total_steps": 2,
+  "total_reward": 3.693401716573884,
+  "episode_length": 2,
+  "start_timestamp": 1748629139.6565912,
+  "end_timestamp": 1748629139.6566699,
+  "final_ante": 1,
+  "max_chips": 50,
+  "max_money": 12,
+  "strategy_tag_counts": {
+    "action_select_card_2": 1,
+    "hand_building": 1,
+    "action_play_hand": 1,
+    "aggressive": 1
+  }
+}
